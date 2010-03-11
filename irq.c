@@ -75,11 +75,6 @@ void DMA2_Channel2_IRQHandler(void) { for(;;); }
 void DMA2_Channel3_IRQHandler(void) { for(;;); }
 void DMA2_Channel4_5_IRQHandler(void) { for(;;); }
 
-void assert_failed()
-{
-for(;;);
-}
-
 #ifdef __cplusplus
 }
 #endif
