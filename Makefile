@@ -8,11 +8,11 @@ LD=arm-elf-gcc
 NM=arm-elf-nm
 OBJCOPY=arm-elf-objcopy
 
-MYCFLAGS=-std=c99 -Os -gdwarf-2-pedantic -Wall -Wcast-align -Wcast-qual \
+MYCFLAGS=-std=c99 -Os -gdwarf-2 -pedantic -Wall -Wcast-align -Wcast-qual \
     -Wchar-subscripts -Winline -Wpointer-arith -Wredundant-decls -Wshadow \
     -Wwrite-strings
 
-CFLAGS=-mthumb -mcpu=cortex-m3 -mtune=cortex-m3 -ffunction-sections -I.
+CFLAGS=-mthumb -mcpu=cortex-m3 -mtune=cortex-m3 -ffunction-sections $(MYCFLAGS) -I.
 GENDEPFLAGS=-MD -MP -MF .deps/$(@F).d
 LDFLAGS=-static -Wl,-Map,$(PROJ).map,--gc-sections -nostartfiles -T stm32.ld 
 

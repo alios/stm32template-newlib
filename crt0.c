@@ -160,7 +160,7 @@ void _start()
   {
     const unsigned int bsslen
       = (unsigned int)&_ebss - (unsigned int)&_sbss;
-    bzero(&_sbss, bsslen);
+    memset(&_sbss, 0x0, bsslen);
   }
 
   main();
