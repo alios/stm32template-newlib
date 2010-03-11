@@ -57,15 +57,6 @@ SECTIONS
 	. = ALIGN(4);
     } >FLASH
  
-    /* for some STRx devices, the beginning of the startup code is stored in the .flashtext section, which goes to FLASH */
-    .flashtext :
-    {
-	. = ALIGN(4);
-        *(.flashtext)            /* Startup code */
-	. = ALIGN(4);
-    } >FLASH
- 
-    
     /* the program code is stored in the .text section, which goes to Flash */
     .text :
     {
