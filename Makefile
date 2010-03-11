@@ -7,6 +7,7 @@ CC=arm-elf-gcc
 LD=arm-elf-gcc
 NM=arm-elf-nm
 OBJCOPY=arm-elf-objcopy
+LINT=splint
 
 MYCFLAGS=-std=c99 -Os -gdwarf-2 -pedantic -Wall -Wcast-align -Wcast-qual \
     -Wchar-subscripts -Winline -Wpointer-arith -Wredundant-decls -Wshadow \
@@ -31,6 +32,7 @@ $(PROJ).elf: $(OBJS) stm32.ld
 	$(LD) $(LDFLAGS) $(OBJS) $(OOBJS) -o $@
 
 %.o : %.c
+	$(LINT) -posix-lib -weak $<
 	$(CC) $(CFLAGS) $(GENDEPFLAGS) -o $@ -c $<
 
 %.sym: %.elf
