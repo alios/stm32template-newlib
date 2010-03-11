@@ -1,6 +1,8 @@
+#include <stdio.h>
 
 int main(void)
 {
-	for(;;);
+  /*  putchar(0x23); */
+  for(;;);
 }
 
