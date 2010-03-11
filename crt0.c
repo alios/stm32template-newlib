@@ -152,15 +152,15 @@ void _start()
 {
   /* copy data segment from flash to ram */
   {
-    const unsigned int datalen 
-      = (unsigned int)&_edata - (unsigned int)&_sdata;
+    const size_t datalen 
+      = (size_t)&_edata - (unsigned int)&_sdata;
     memcpy(&_sdata, &_sidata, datalen);
   }
 
   /* zero out bss segment */
   {
-    const unsigned int bsslen
-      = (unsigned int)&_ebss - (unsigned int)&_sbss;
+    const size_t bsslen
+      = (size_t)&_ebss - (unsigned int)&_sbss;
     memset(&_sbss, 0x0, bsslen);
   }
 
