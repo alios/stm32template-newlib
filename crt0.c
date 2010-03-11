@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "irq.h"
+#include "crt1.h"
 
 extern int main();
 
@@ -160,9 +161,10 @@ void _start()
   {
     const unsigned int bsslen
       = (unsigned int)&_ebss - (unsigned int)&_sbss;
-    bzero(&_sbss, bsslen);
+    memset(&_sbss, 0x0, bsslen);
   }
 
-  main();
+  (void) _init_crt1();
+  (void) main();
 }
 

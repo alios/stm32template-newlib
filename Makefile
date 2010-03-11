@@ -1,7 +1,7 @@
 # Hey Emacs, this is a -*- makefile -*-
 
 
-PROJ=stm32template
+PROJ=stm32template-newlib
 
 CC=arm-elf-gcc
 LD=arm-elf-gcc
@@ -19,7 +19,8 @@ LDFLAGS=-static -Wl,-Map,$(PROJ).map,--gc-sections -nostartfiles -T stm32.ld
 OBJS = \
  main.o \
  irq.o \
- crt0.o
+ crt0.o \
+ crt1.o
 
 
 all: $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
