@@ -1,70 +1,115 @@
-#include <unistd.h>
-#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/stat.h>
 
+#include "devices.h"
+#include "console.h"
 #include "irq.h"
 
-#define BUFFERSIZE 0x100
-
-extern void* _sheap;
-extern void* _eheap;
-
-static void* heap_ptr = &_sheap;
-
-typedef struct ringbuffer {
-  size_t read_i;
-  size_t write_i;
-  uint8_t buffer[BUFFERSIZE];
-} ringbuffer_t;
-
-typedef struct {
-   const char *name;
-   int (*open_r )( struct _reent *r, const char *path, int flags, int mode );
-   int (*close_r )( struct _reent *r, int fd ); 
-   long (*write_r ) ( struct _reent *r, int fd, const char *ptr, int len );
-   long (*read_r )( struct _reent *r, int fd, char *ptr, int len );
-} devoptab_t;
 
 
-ringbuffer_t stdout_b; 
+extern int8_t _sheap;
+extern int8_t _eheap;
+static intptr_t heap_ptr = (intptr_t)&_sheap;
 
-//const devoptab_t devoptab_console 
+const devoptab_t *devoptab_list[] = {
+  &devoptab_console, /* stdin */
+  &devoptab_console, /* stdout */
+  &devoptab_console, /* stderr */
+  NULL
+};
 
-
-void _init_crt1() 
+long _write_r(struct _reent *ptr, int fd, const void *buf, int cnt)
 {
-  /* set the heap with 0xff */
-  {
-    const ssize_t heapsize = ((ssize_t)(_eheap)) - ((ssize_t)_sheap);
-    memset(&_sheap, 0xff, heapsize);
-  }
-
-  stdout_b.read_i = 0;
-  stdout_b.write_i = 0;
+  return devoptab_list[fd]->write_r(ptr, fd, buf, cnt);
 }
 
+long _read_r(struct _reent *r, int fd, char *ptr, int len )
+{
+  return devoptab_list[fd]->read_r(r, fd, ptr, len);
+}
+
+long _close_r(struct _reent *r, int fd)
+{
+  return devoptab_list[fd]->close_r(r, fd);
+}
+
+int _open_r (struct _reent *ptr, const char *file, int flags, int mode)
+{
+  int which_devoptab = 0;
+  int fd = -1;
+  
+  /* search for "file" in dotab_list[].name */
+  do {
+    const devoptab_t* dev = devoptab_list[which_devoptab];
+    
+    if(dev == NULL)
+      break;
+    
+    if(strcmp(dev->name, file ) == 0 ) 
+      {
+	fd = which_devoptab;
+	break;
+      }
+  } while(devoptab_list[which_devoptab++]);
+
+  /* if we found the requested file/device, invoke the device's open_r() */
+  if(fd != -1) {
+      devoptab_list[fd]->open_r(ptr, file, flags, mode);
+  } else {    
+    errno = ENODEV;
+  }
+
+  return fd;
+}
+
+int _stat_r (struct _reent *_r, const char *file, struct stat *pstat)
+{
+   pstat->st_mode = S_IFCHR;
+   return 0;
+}
+
+int _fstat_r ( struct _reent *_r, int fd, struct stat *pstat)
+{
+   pstat->st_mode = S_IFCHR;
+   return 0;
+}
+
+off_t _lseek_r( struct _reent *_r, int fd, off_t pos, int whence )
+{
+   return 0;
+}
+
+int _isatty( struct _reent *_r, int fd)
+{
+  errno = ENOTTY;
+  return 0;
+}
 
 void *_sbrk(intptr_t incr)
 {
   void* retval = 0;
-  disable_irqs();
+  intptr_t newbrk = (intptr_t)((size_t)heap_ptr + (size_t)incr);
 
-  void* newbrk = (void *)((ssize_t)heap_ptr + (ssize_t)incr);
-
-
-  if(newbrk >= _eheap)
+  if(newbrk >=  (intptr_t)&_eheap)
     {
       errno = ENOMEM;
       retval = (void *)-1;
     }
   else 
     {
-      heap_ptr = (void *)newbrk;
+      heap_ptr = newbrk;
     }
 
-  enable_irqs();
   return  retval;
 }
 
+void _init_crt1() 
+{
+  /* set the heap with 0xff */
+  {
+    const size_t heapsize = ((size_t)(_eheap)) - ((size_t)_sheap);
+    memset(&_sheap, 0xff, heapsize);
+  }
+}

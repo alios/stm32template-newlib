@@ -21,7 +21,8 @@ OBJS = \
  main.o \
  irq.o \
  crt0.o \
- crt1.o
+ crt1.o \
+ console.o
 
 
 all: $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
@@ -33,7 +34,7 @@ $(PROJ).elf: $(OBJS) stm32.ld
 	$(LD) $(LDFLAGS) $(OBJS) $(OOBJS) -o $@
 
 %.o : %.c
-	$(LINT) -posix-lib -weak $<
+#	$(LINT) -posix-lib -weak $<
 	$(CC) $(CFLAGS) $(GENDEPFLAGS) -o $@ -c $<
 
 %.sym: %.elf
