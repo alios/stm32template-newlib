@@ -28,7 +28,7 @@ OBJS = \
 all: $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
 	$(READELF) -l $(PROJ).elf
 clean:
-	rm -rf .deps $(OBJS) $(PROJ).elf $(PROJ).map $(PROJ).hex $(PROJ).sym $(PROJ.bin)
+	rm -rf .deps $(OBJS) $(PROJ).elf $(PROJ).map $(PROJ).hex $(PROJ).sym $(PROJ).bin
 
 $(PROJ).elf: $(OBJS) $(LDFILE) 
 	$(LD) $(LDFLAGS) $(OBJS) $(OOBJS) -o $@
