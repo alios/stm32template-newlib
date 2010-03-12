@@ -1,13 +1,14 @@
 # Hey Emacs, this is a -*- makefile -*-
-
-
 PROJ=stm32template-newlib
 
 CC=arm-elf-gcc
 LD=arm-elf-gcc
 NM=arm-elf-nm
 OBJCOPY=arm-elf-objcopy
+READELF=arm-elf-readelf
 LINT=splint
+
+LDFILE=stm32.ld
 
 MYCFLAGS=-std=c99 -Os -gdwarf-2 -pedantic -Wall -Wcast-align -Wcast-qual \
     -Wchar-subscripts -Winline -Wpointer-arith -Wredundant-decls -Wshadow \
@@ -15,7 +16,7 @@ MYCFLAGS=-std=c99 -Os -gdwarf-2 -pedantic -Wall -Wcast-align -Wcast-qual \
 
 CFLAGS=-mthumb -mcpu=cortex-m3 -mtune=cortex-m3 -ffunction-sections $(MYCFLAGS) -I.
 GENDEPFLAGS=-MD -MP -MF .deps/$(@F).d
-LDFLAGS=-static -Wl,-Map,$(PROJ).map,--gc-sections -nostartfiles -T stm32.ld 
+LDFLAGS=-static -Wl,-Map,$(PROJ).map,--gc-sections -nostartfiles -T $(LDFILE)
 
 OBJS = \
  main.o \
@@ -26,11 +27,11 @@ OBJS = \
 
 
 all: $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
-
+	$(READELF) -l $(PROJ).elf
 clean:
 	rm -rf .deps $(OBJS) $(PROJ).elf $(PROJ).map $(PROJ).hex $(PROJ).sym $(PROJ.bin)
 
-$(PROJ).elf: $(OBJS) stm32.ld
+$(PROJ).elf: $(OBJS) $(LDFILE) 
 	$(LD) $(LDFLAGS) $(OBJS) $(OOBJS) -o $@
 
 %.o : %.c
