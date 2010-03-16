@@ -1,5 +1,5 @@
-#ifndef __IRQ_H__
-#define __IRQ_H__
+#ifndef IRQ_H__
+#define IRQ_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,4 +83,4 @@ extern "C" {
 #endif
 
 
-#endif // __IRQ_H__
+#endif // IRQ_H__

@@ -8,6 +8,9 @@ OBJCOPY=arm-elf-objcopy
 READELF=arm-elf-readelf
 LINT=splint
 
+#USE_LINT=1
+
+LINTFLAGS=-posix-lib # -weak
 LDFILE=stm32.ld
 
 MYCFLAGS=-std=c99 -Os -gdwarf-2 -pedantic -Wall -Wcast-align -Wcast-qual \
@@ -35,7 +38,9 @@ $(PROJ).elf: $(OBJS) $(LDFILE)
 	$(LD) $(LDFLAGS) $(OBJS) $(OOBJS) -o $@
 
 %.o : %.c
-#	$(LINT) -posix-lib -weak $<
+ifdef USE_LINT
+	$(LINT) $(LINTFLAGS) $<
+endif	
 	$(CC) $(CFLAGS) $(GENDEPFLAGS) -o $@ -c $<
 
 %.sym: %.elf
