@@ -19,15 +19,15 @@ static int console_close_r(struct _reent *r, int fd);
 static long console_write_r(struct _reent *r, int fd, const char *ptr, int len);
 static long console_read_r(struct _reent *r, int fd, char *ptr, int len );
 
-
-ringbuffer_t stdout_b; 
-
-
 const devoptab_t devoptab_console = { "console", 
 				      console_open_r, 
 				      console_close_r,
 				      console_write_r,
 				      console_read_r };
+
+
+
+ringbuffer_t stdout_b; 
 
 
 static int console_open_r(struct _reent *r, const char *path, int flags, int mode)

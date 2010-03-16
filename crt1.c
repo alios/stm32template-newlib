@@ -7,11 +7,12 @@
 #include "console.h"
 #include "irq.h"
 
-
-
 extern int8_t _sheap;
 extern int8_t _eheap;
-static intptr_t heap_ptr = (intptr_t)&_sheap;
+static const int8_t* eheap_p = &_eheap;
+static const int8_t* sheap_p = &_sheap;
+
+static intptr_t heap_ptr;
 
 const devoptab_t *devoptab_list[] = {
   &devoptab_console, /* stdin */
@@ -92,7 +93,7 @@ void *_sbrk(intptr_t incr)
   void* retval = 0;
   intptr_t newbrk = (intptr_t)((size_t)heap_ptr + (size_t)incr);
 
-  if(newbrk >=  (intptr_t)&_eheap)
+  if(newbrk >=  (intptr_t)eheap_p)
     {
       errno = ENOMEM;
       retval = (void *)-1;
@@ -109,7 +110,9 @@ void _init_crt1()
 {
   /* set the heap with 0xff */
   {
-    const size_t heapsize = ((size_t)(_eheap)) - ((size_t)_sheap);
+    const size_t heapsize = ((size_t)(eheap_p)) - ((size_t)sheap_p);
     memset(&_sheap, 0xff, heapsize);
+
+    heap_ptr = (const intptr_t)sheap_p;
   }
 }

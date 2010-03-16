@@ -13,7 +13,7 @@ __Stack_Init = _estack  - __Stack_Size ;
 /*"PROVIDE" allows to easily override these values from an object file or the commmand line.*/
 PROVIDE ( _Stack_Init = __Stack_Init ) ;
 
-_Heap_Size = 0x200;
+_Heap_Size = 0x8000;
 
 /*
 There will be a link error if there is not this amount of RAM free at the end.
