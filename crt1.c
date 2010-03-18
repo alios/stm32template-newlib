@@ -21,22 +21,22 @@ const devoptab_t *devoptab_list[] = {
   NULL
 };
 
-long _write_r(struct _reent *ptr, int fd, const void *buf, int cnt)
+long _write_r(struct _reent *_r, int fd, const void *buf, int cnt)
 {
-  return devoptab_list[fd]->write_r(ptr, fd, buf, cnt);
+  return devoptab_list[fd]->write_r(_r, fd, buf, cnt);
 }
 
-long _read_r(struct _reent *r, int fd, char *ptr, int len )
+long _read_r(struct _reent *_r, int fd, char *ptr, int len )
 {
-  return devoptab_list[fd]->read_r(r, fd, ptr, len);
+  return devoptab_list[fd]->read_r(_r, fd, ptr, len);
 }
 
-long _close_r(struct _reent *r, int fd)
+long _close_r(struct _reent *_r, int fd)
 {
-  return devoptab_list[fd]->close_r(r, fd);
+  return devoptab_list[fd]->close_r(_r, fd);
 }
 
-int _open_r (struct _reent *ptr, const char *file, int flags, int mode)
+int _open_r (struct _reent *_r, const char *file, int flags, int mode)
 {
   int which_devoptab = 0;
   int fd = -1;
@@ -57,9 +57,9 @@ int _open_r (struct _reent *ptr, const char *file, int flags, int mode)
 
   /* if we found the requested file/device, invoke the device's open_r() */
   if(fd != -1) {
-      devoptab_list[fd]->open_r(ptr, file, flags, mode);
+      devoptab_list[fd]->open_r(_r, file, flags, mode);
   } else {    
-    errno = ENODEV;
+    _r->_errno = ENODEV;
   }
 
   return fd;
@@ -84,22 +84,23 @@ off_t _lseek_r( struct _reent *_r, int fd, off_t pos, int whence )
 
 int _isatty( struct _reent *_r, int fd)
 {
-  errno = ENOTTY;
+  _r->_errno = ENOTTY;
   return 0;
 }
 
-void *_sbrk(intptr_t incr)
+void *_sbrk_r(struct _reent *r, intptr_t incr)
 {
   void* retval = 0;
   intptr_t newbrk = (intptr_t)((size_t)heap_ptr + (size_t)incr);
 
   if(newbrk >=  (intptr_t)eheap_p)
     {
-      errno = ENOMEM;
+      r->_errno = ENOMEM;
       retval = (void *)-1;
     }
   else 
     {
+	  retval = (void*)heap_ptr;
       heap_ptr = newbrk;
     }
 
@@ -112,7 +113,6 @@ void _init_crt1()
   {
     const size_t heapsize = ((size_t)(eheap_p)) - ((size_t)sheap_p);
     memset(&_sheap, 0xff, heapsize);
-
     heap_ptr = (const intptr_t)sheap_p;
   }
 }
