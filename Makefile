@@ -59,6 +59,7 @@ STM32DSPLIBOBJS= \
 OBJS = \
  $(STM32LIBOBJS) \
  $(STM32DSPLIBOBJS) \
+ $(STM32USBLIBOBJS) \
  main.o \
  irq.o \
  crt0.o \
