@@ -1,13 +1,15 @@
 # Hey Emacs, this is a -*- makefile -*-
 PROJ=stm32template-newlib
 
-CC=arm-elf-gcc
-AS=arm-elf-as
-LD=arm-elf-gcc
-NM=arm-elf-nm
-OBJCOPY=arm-elf-objcopy
-READELF=arm-elf-readelf
+CC=arm-eabi-gcc
+AS=arm-eabi-as
+LD=arm-eabi-gcc
+NM=arm-eabi-nm
+AR=arm-eabi-ar
+OBJCOPY=arm-eabi-objcopy
+READELF=arm-eabi-readelf
 LINT=splint
+
 
 #USE_LINT=1
 
@@ -16,64 +18,82 @@ LDFILE=stm32.ld
 
 MYCFLAGS=-std=c99 -Os -gdwarf-2 -pedantic -Wall -Wcast-align -Wcast-qual \
     -Wchar-subscripts -Winline -Wpointer-arith -Wredundant-decls -Wshadow \
-    -Wwrite-strings
+    -Wwrite-strings 
 
-STM32LIB_DIR=lib/stm32lib
-STM32LIB_SRCS=$(STM32LIB_DIR)/src
-STM32LIB_INC=$(STM32LIB_DIR)/include
 
-STM32DSPLIB_DIR=lib/stm32dsplib
-STM32DSPLIB_SRCS=$(STM32DSPLIB_DIR)/src
-STM32DSPLIB_INC=$(STM32DSPLIB_DIR)/include
+all: libs $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
+	$(READELF) -l $(PROJ).elf
 
-INCLUDE=-I. -I$(STM32LIB_INC) -I$(STM32DSPLIB_INC)
+LIB_STM32_DIR=lib/stm32lib
+LIB_STM32_INCDIR=$(LIB_STM32_DIR)/include
+LIB_STM32_SRCS=$(wildcard $(LIB_STM32_DIR)/src/*.c)
+LIB_STM32_OBJS=$(patsubst %c, %o, $(LIB_STM32_SRCS))
+LIB_STM32_TARGET=$(LIB_STM32_DIR)/libstm32.a
+$(LIB_STM32_TARGET): $(LIB_STM32_OBJS)
+	$(AR) rDfs $(LIB_STM32_TARGET) $(LIB_STM32_OBJS)
+
+
+LIB_BSP_DIR=bsp
+LIB_BSP_INCDIR=$(LIB_BSP_DIR)
+LIB_BSP_SRCS=$(wildcard $(LIB_BSP_DIR)/*.c)
+LIB_BSP_OBJS=$(patsubst %c, %o, $(LIB_BSP_SRCS))
+LIB_BSP_TARGET=bsp.a
+$(LIB_BSP_TARGET): $(LIB_BSP_OBJS)
+	$(AR) rDfs $(LIB_BSP_TARGET) $(LIB_BSP_OBJS)
+
+LIB_CRT_DIR=crt
+LIB_CRT_INCDIR=$(LIB_CRT_DIR)
+LIB_CRT_SRCS=$(wildcard $(LIB_CRT_DIR)/*.c)
+LIB_CRT_OBJS=$(patsubst %c, %o, $(LIB_CRT_SRCS))
+LIB_CRT_TARGET=crt.a
+
+$(LIB_CRT_TARGET): $(LIB_CRT_OBJS)
+	$(AR) rDfs $(LIB_CRT_TARGET) $(LIB_CRT_OBJS)
+
+
+LIB_STM32DSP_DIR=lib/stm32dsplib
+LIB_STM32DSP_INCDIR=$(LIB_STM32DSP_DIR)/include
+LIB_STM32DSP_CSRCS=$(wildcard $(LIB_STM32DSP_DIR)/src/*.c)
+LIB_STM32DSP_SSRCS=$(wildcard $(LIB_STM32DSP_DIR)/src/*.s)
+LIB_STM32DSP_COBJS=$(patsubst %c, %o, $(LIB_STM32DSP_CSRCS))
+LIB_STM32DSP_SOBJS=$(patsubst %s, %o, $(LIB_STM32DSP_SSRCS))
+LIB_STM32DSP_OBJS=$(LIB_STM32DSP_COBJS) $(LIB_STM32DSP_SOBJS)
+LIB_STM32DSP_TARGET=$(LIB_STM32DSP_DIR)/libstm32dsp.a
+$(LIB_STM32DSP_TARGET): $(LIB_STM32DSP_OBJS)
+	$(AR) rDfs $(LIB_STM32DSP_TARGET) $(LIB_STM32DSP_OBJS)
+
+
+CSRCS=$(wildcard *.c)
+SSRCS=$(wildcard *.s)
+COBJS=$(patsubst %c, %o, $(CSRCS))
+SOBJS=$(patsubst %s, %o, $(SSRCS))
+OBJS=$(COBJS) $(SOBJS)
+
+LIBS = $(LIB_STM32_TARGET) $(LIB_STM32DSP_TARGET) $(LIB_BSP_TARGET) $(LIB_CRT_TARGET)
+
+libs : $(LIBS)
+
+libsclean : 
+	rm -f $(LIB_STM32_TARGET) $(LIB_STM32_OBJS) \
+		 $(LIB_STM32DSP_TARGET) $(LIB_STM32DSP_OBJS) \
+		 $(LIB_BSP_TARGET) $(LIB_BSP_OBJS) \
+		 $(LIB_CRT_TARGET) $(LIB_CRT_OBJS) 
+
+INCLUDE=-I. -I$(LIB_STM32_INCDIR) -I$(LIB_STM32DSP_INCDIR) \
+	-I$(LIB_BSP_INCDIR) -I$(LIB_CRT_INCDIR)
+
+
+
 CFLAGS=-mthumb -mcpu=cortex-m3 -mtune=cortex-m3 -ffunction-sections $(MYCFLAGS) $(INCLUDE)
 ASFLAGS=-mcpu=cortex-m3 -mthumb --gdwarf-2
 GENDEPFLAGS=-MD -MP -MF .deps/$(@F).d
-LDFLAGS=-static -Wl,-Map,$(PROJ).map,--gc-sections -nostartfiles -T $(LDFILE)
-
-STM32LIBOBJS= \
- $(STM32LIB_SRCS)/core_cm3.o $(STM32LIB_SRCS)/system_stm32f10x.o \
- $(STM32LIB_SRCS)/misc.o $(STM32LIB_SRCS)/stm32f10x_adc.o \
- $(STM32LIB_SRCS)/stm32f10x_bkp.o $(STM32LIB_SRCS)/stm32f10x_can.o \
- $(STM32LIB_SRCS)/stm32f10x_cec.o $(STM32LIB_SRCS)/stm32f10x_crc.o \
- $(STM32LIB_SRCS)/stm32f10x_dac.o $(STM32LIB_SRCS)/stm32f10x_dbgmcu.o \
- $(STM32LIB_SRCS)/stm32f10x_dma.o $(STM32LIB_SRCS)/stm32f10x_exti.o \
- $(STM32LIB_SRCS)/stm32f10x_flash.o $(STM32LIB_SRCS)/stm32f10x_fsmc.o \
- $(STM32LIB_SRCS)/stm32f10x_gpio.o $(STM32LIB_SRCS)/stm32f10x_i2c.o \
- $(STM32LIB_SRCS)/stm32f10x_iwdg.o $(STM32LIB_SRCS)/stm32f10x_pwr.o \
- $(STM32LIB_SRCS)/stm32f10x_rcc.o $(STM32LIB_SRCS)/stm32f10x_rtc.o \
- $(STM32LIB_SRCS)/stm32f10x_sdio.o $(STM32LIB_SRCS)/stm32f10x_spi.o \
- $(STM32LIB_SRCS)/stm32f10x_tim.o $(STM32LIB_SRCS)/stm32f10x_usart.o \
- $(STM32LIB_SRCS)/stm32f10x_wwdg.o
-
-STM32DSPLIBOBJS= \
- $(STM32DSPLIB_SRCS)/PID_C_stm32.o $(STM32DSPLIB_SRCS)/PID_stm32.o \
- $(STM32DSPLIB_SRCS)/cr4_fft_1024_stm32.o \
- $(STM32DSPLIB_SRCS)/cr4_fft_256_stm32.o \
- $(STM32DSPLIB_SRCS)/cr4_fft_64_stm32.o \
- $(STM32DSPLIB_SRCS)/fir_stm32.o \
- $(STM32DSPLIB_SRCS)/iir_stm32.o \
- $(STM32DSPLIB_SRCS)/iirarma_stm32.o
-
-OBJS = \
- $(STM32LIBOBJS) \
- $(STM32DSPLIBOBJS) \
- $(STM32USBLIBOBJS) \
- main.o \
- irq.o \
- crt0.o \
- crt1.o \
- console.o
-
-
-all: $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
-	$(READELF) -l $(PROJ).elf
-clean:
-	rm -rf .deps $(OBJS) $(PROJ).elf $(PROJ).map $(PROJ).hex $(PROJ).sym $(PROJ).bin
+LDFLAGS=-static -Wl,-Map,$(PROJ).map,--gc-sections -nostartfiles -T $(LDFILE) 
 
 $(PROJ).elf: $(OBJS) $(LDFILE) 
-	$(LD) $(LDFLAGS) $(OBJS) $(OOBJS) -o $@
+	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
+
+clean: libsclean
+	rm -f $(OBJS) $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
 
 %.o : %.c
 ifdef USE_LINT
@@ -95,5 +115,5 @@ endif
 
 -include $(shell mkdir -p .deps 2>/dev/null) $(wildcard .dep/*)
 
-.PHONY : all clean
+.PHONY : all clean libs libclean
 

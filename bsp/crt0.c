@@ -2,7 +2,6 @@
 #include <string.h>
 
 #include "irq.h"
-#include "crt1.h"
 
 extern int main();
 
@@ -14,6 +13,7 @@ extern void* _sbss;
 extern void* _ebss;
 
 void _start();
+extern void _init_crt1();
 
 /* IRQ vector table */
 __attribute__ ((section(".isr_vector")))

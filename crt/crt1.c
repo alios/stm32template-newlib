@@ -3,8 +3,6 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include "devices.h"
-#include "console.h"
 #include "irq.h"
 
 extern int8_t _sheap;
@@ -14,55 +12,29 @@ static const int8_t* sheap_p = &_sheap;
 
 static intptr_t heap_ptr;
 
-const devoptab_t *devoptab_list[] = {
-  &devoptab_console, /* stdin */
-  &devoptab_console, /* stdout */
-  &devoptab_console, /* stderr */
-  NULL
-};
 
 long _write_r(struct _reent *_r, int fd, const void *buf, int cnt)
 {
-  return devoptab_list[fd]->write_r(_r, fd, buf, cnt);
+  _r->_errno = EBADF;
+  return -1;
 }
 
 long _read_r(struct _reent *_r, int fd, char *ptr, int len )
 {
-  return devoptab_list[fd]->read_r(_r, fd, ptr, len);
+  _r->_errno = EBADF;
+  return -1;
 }
 
 long _close_r(struct _reent *_r, int fd)
 {
-  return devoptab_list[fd]->close_r(_r, fd);
+  _r->_errno = EBADF;
+  return -1;
 }
 
 int _open_r (struct _reent *_r, const char *file, int flags, int mode)
-{
-  int which_devoptab = 0;
-  int fd = -1;
-  
-  /* search for "file" in dotab_list[].name */
-  do {
-    const devoptab_t* dev = devoptab_list[which_devoptab];
-    
-    if(dev == NULL)
-      break;
-    
-    if(strcmp(dev->name, file ) == 0 ) 
-      {
-	fd = which_devoptab;
-	break;
-      }
-  } while(devoptab_list[which_devoptab++]);
-
-  /* if we found the requested file/device, invoke the device's open_r() */
-  if(fd != -1) {
-      devoptab_list[fd]->open_r(_r, file, flags, mode);
-  } else {    
-    _r->_errno = ENODEV;
-  }
-
-  return fd;
+{ 
+  _r->_errno = ENODEV;
+  return -1;
 }
 
 int _stat_r (struct _reent *_r, const char *file, struct stat *pstat)
