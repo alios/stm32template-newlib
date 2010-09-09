@@ -4,7 +4,6 @@
 extern "C" {
 #endif
 
-  void _stack(void) { for(;;); }
   void NMIException(void) { for(;;); }
   void HardFaultException(void) { for(;;); }
   void MemManageException(void) { for(;;); }
