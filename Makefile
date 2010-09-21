@@ -93,7 +93,7 @@ $(PROJ).elf: $(OBJS) $(LDFILE)
 	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 
 clean: libsclean
-	rm -f $(OBJS) $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
+	rm -f $(OBJS) $(PROJ).map $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
 
 %.o : %.c
 ifdef USE_LINT
