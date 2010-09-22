@@ -18,7 +18,7 @@ LDFILE=stm32.ld
 
 MYCFLAGS=-std=c99 -Os -gdwarf-2 -pedantic -Wall -Wcast-align -Wcast-qual \
     -Wchar-subscripts -Winline -Wpointer-arith -Wredundant-decls -Wshadow \
-    -Wwrite-strings 
+    -Wwrite-strings -DSTM32F10X_XL -DUSE_STDPERIPH_DRIVER -DDEBUG -USE_FULL_ASSERT
 
 
 all: libs $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
@@ -89,7 +89,7 @@ ASFLAGS=-mcpu=cortex-m3 -mthumb --gdwarf-2
 GENDEPFLAGS=-MD -MP -MF .deps/$(@F).d
 LDFLAGS=-static -Wl,-Map,$(PROJ).map,--gc-sections -nostartfiles -T $(LDFILE) 
 
-$(PROJ).elf: $(OBJS) $(LDFILE) 
+$(PROJ).elf: $(OBJS) $(LIBS) $(LDFILE) 
 	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 
 clean: libsclean
