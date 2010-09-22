@@ -18,7 +18,7 @@ LDFILE=stm32.ld
 
 MYCFLAGS=-std=c99 -Os -gdwarf-2 -pedantic -Wall -Wcast-align -Wcast-qual \
     -Wchar-subscripts -Winline -Wpointer-arith -Wredundant-decls -Wshadow \
-    -Wwrite-strings -DSTM32F10X_XL -DUSE_STDPERIPH_DRIVER -DDEBUG -USE_FULL_ASSERT
+    -Wwrite-strings -DSTM32F10X_XL -DUSE_STDPERIPH_DRIVER -DDEBUG -DUSE_FULL_ASSERT
 
 
 all: libs $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
