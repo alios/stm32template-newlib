@@ -13,8 +13,6 @@ static intptr_t heap_ptr;
 
 size_t heap_peak = 0x0;
 
-
-/*
 long _write_r(struct _reent *_r, int fd, const void *buf, int cnt)
 {
   _r->_errno = EBADF;
@@ -27,30 +25,6 @@ long _read_r(struct _reent *_r, int fd, char *ptr, int len )
   return -1;
 }
 
-long _close_r(struct _reent *_r, int fd)
-{
-  _r->_errno = EBADF;
-  return -1;
-}
-
-int _open_r (struct _reent *_r, const char *file, int flags, int mode)
-{ 
-  _r->_errno = ENODEV;
-  return -1;
-}
-
-int _stat_r (struct _reent *_r, const char *file, struct stat *pstat)
-{
-   pstat->st_mode = S_IFCHR;
-   return 0;
-}
-
-int _fstat_r ( struct _reent *_r, int fd, struct stat *pstat)
-{
-   pstat->st_mode = S_IFCHR;
-   return 0;
-}
-
 off_t _lseek_r( struct _reent *_r, int fd, off_t pos, int whence )
 {
    return 0;
@@ -60,6 +34,25 @@ int _isatty( struct _reent *_r, int fd)
 {
   _r->_errno = ENOTTY;
   return 0;
+}
+
+int _fstat_r ( struct _reent *_r, int fd, struct stat *pstat)
+{
+   pstat->st_mode = S_IFCHR;
+   return 0;
+}
+
+long _close_r(struct _reent *_r, int fd)
+{
+  _r->_errno = EBADF;
+  return -1;
+}
+
+/*
+int _open_r (struct _reent *_r, const char *file, int flags, int mode)
+{ 
+  _r->_errno = ENODEV;
+  return -1;
 }
 */
 

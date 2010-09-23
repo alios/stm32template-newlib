@@ -5,11 +5,20 @@
 extern "C" {
 #endif
 
+
+
+#ifdef CONFIG_IRQStats
+
+#endif /* CONFIG_IRQStats */
+
+  void IRQHandler(void);
+
   void NMIException(void);
   void HardFaultException(void);
   void MemManageException(void);
   void BusFaultException(void);
   void UsageFaultException(void);
+
   void SVC_Handler(void);
   void DebugMon_Handler(void);
   void PendSV_Handler(void);

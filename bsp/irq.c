@@ -1,15 +1,32 @@
+#include <stdint.h>
 #include "irq.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
+  void SVC_Handler_main(uint32_t* svc_args) 
+  { 
+    uint32_t svc_number;
+
+    svc_number = ((char *)svc_args[6])[-2];
+
+    switch(svc_number)
+      {
+      case 0:
+	break;
+      default:
+	break;
+      }
+  }
+
+
   void NMIException(void) { for(;;); }
   void HardFaultException(void) { for(;;); }
   void MemManageException(void) { for(;;); }
   void BusFaultException(void) { for(;;); }
   void UsageFaultException(void) { for(;;); }
-  void SVC_Handler(void) { for(;;); }
   void DebugMon_Handler(void) { for(;;); }
   void PendSV_Handler(void) { for(;;); }
   void SysTick_Handler(void) { for(;;); }

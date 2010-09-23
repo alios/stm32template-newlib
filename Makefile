@@ -25,40 +25,48 @@ all: libs $(PROJ).elf $(PROJ).sym $(PROJ).hex $(PROJ).bin
 	$(READELF) -l $(PROJ).elf
 
 LIB_STM32_DIR=lib/stm32lib
+LIB_STM32_LIB=stm32
 LIB_STM32_INCDIR=$(LIB_STM32_DIR)/include
 LIB_STM32_SRCS=$(wildcard $(LIB_STM32_DIR)/src/*.c)
 LIB_STM32_OBJS=$(patsubst %c, %o, $(LIB_STM32_SRCS))
-LIB_STM32_TARGET=$(LIB_STM32_DIR)/libstm32.a
+LIB_STM32_TARGET=lib$(LIB_STM32_LIB).a
 $(LIB_STM32_TARGET): $(LIB_STM32_OBJS)
 	$(AR) rDfs $(LIB_STM32_TARGET) $(LIB_STM32_OBJS)
 
 
 LIB_BSP_DIR=bsp
+LIB_BSP_LIB=$(LIB_BSP_DIR)
 LIB_BSP_INCDIR=$(LIB_BSP_DIR)
-LIB_BSP_SRCS=$(wildcard $(LIB_BSP_DIR)/*.c)
-LIB_BSP_OBJS=$(patsubst %c, %o, $(LIB_BSP_SRCS))
-LIB_BSP_TARGET=bsp.a
+LIB_BSP_CSRCS=$(wildcard $(LIB_BSP_DIR)/*.c)
+LIB_BSP_COBJS=$(patsubst %c, %o, $(LIB_BSP_CSRCS))
+LIB_BSP_SSRCS=$(wildcard $(LIB_BSP_DIR)/*.s)
+LIB_BSP_SOBJS=$(patsubst %s, %o, $(LIB_BSP_SSRCS))
+LIB_BSP_SRCS=$(LIB_BSP_CSRCS) $(LIB_BSP_SSRCS)
+LIB_BSP_OBJS=$(LIB_BSP_COBJS) $(LIB_BSP_SOBJS)
+LIB_BSP_TARGET=lib$(LIB_BSP_LIB).a
 $(LIB_BSP_TARGET): $(LIB_BSP_OBJS)
 	$(AR) rDfs $(LIB_BSP_TARGET) $(LIB_BSP_OBJS)
 
 LIB_CRT_DIR=crt
+LIB_CRT_LIB=$(LIB_CRT_DIR)
 LIB_CRT_INCDIR=$(LIB_CRT_DIR)
 LIB_CRT_SRCS=$(wildcard $(LIB_CRT_DIR)/*.c)
 LIB_CRT_OBJS=$(patsubst %c, %o, $(LIB_CRT_SRCS))
-LIB_CRT_TARGET=crt.a
+LIB_CRT_TARGET=lib$(LIB_CRT_LIB).a
 
 $(LIB_CRT_TARGET): $(LIB_CRT_OBJS)
 	$(AR) rDfs $(LIB_CRT_TARGET) $(LIB_CRT_OBJS)
 
 
 LIB_STM32DSP_DIR=lib/stm32dsplib
+LIB_STM32DSP_LIB=stm32dsp
 LIB_STM32DSP_INCDIR=$(LIB_STM32DSP_DIR)/include
 LIB_STM32DSP_CSRCS=$(wildcard $(LIB_STM32DSP_DIR)/src/*.c)
 LIB_STM32DSP_SSRCS=$(wildcard $(LIB_STM32DSP_DIR)/src/*.s)
 LIB_STM32DSP_COBJS=$(patsubst %c, %o, $(LIB_STM32DSP_CSRCS))
 LIB_STM32DSP_SOBJS=$(patsubst %s, %o, $(LIB_STM32DSP_SSRCS))
 LIB_STM32DSP_OBJS=$(LIB_STM32DSP_COBJS) $(LIB_STM32DSP_SOBJS)
-LIB_STM32DSP_TARGET=$(LIB_STM32DSP_DIR)/libstm32dsp.a
+LIB_STM32DSP_TARGET=lib$(LIB_STM32DSP_LIB).a
 $(LIB_STM32DSP_TARGET): $(LIB_STM32DSP_OBJS)
 	$(AR) rDfs $(LIB_STM32DSP_TARGET) $(LIB_STM32DSP_OBJS)
 
@@ -84,10 +92,11 @@ INCLUDE=-I. -I$(LIB_STM32_INCDIR) -I$(LIB_STM32DSP_INCDIR) \
 
 
 
+#-ffunction-sections 
 CFLAGS=-mthumb -mcpu=cortex-m3 -mtune=cortex-m3 -ffunction-sections $(MYCFLAGS) $(INCLUDE)
-ASFLAGS=-mcpu=cortex-m3 -mthumb --gdwarf-2
+ASFLAGS=-mcpu=cortex-m3 -mthumb --gdwarf-2 
 GENDEPFLAGS=-MD -MP -MF .deps/$(@F).d
-LDFLAGS=-static -Wl,-Map,$(PROJ).map,--gc-sections -nostartfiles -T $(LDFILE) 
+LDFLAGS=-static -L. -l$(LIB_STM32_LIB) -l$(LIB_STM32DSP_LIB) -l$(LIB_BSP_LIB) -l$(LIB_CRT_LIB) -Wl,-Map,$(PROJ).map,--gc-sections -nostartfiles -T $(LDFILE) 
 
 $(PROJ).elf: $(OBJS) $(LIBS) $(LDFILE) 
 	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $@

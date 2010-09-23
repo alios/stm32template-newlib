@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stm32f10x_conf.h>
 
 #include "irq.h"
 
@@ -11,6 +12,7 @@ extern void* _edata;
 extern void* _sidata;
 extern void* _sbss;
 extern void* _ebss;
+extern void* _eusrstack;
 
 void _start();
 extern void _init_crt1();
@@ -163,6 +165,8 @@ void _start()
       = (size_t)&_ebss - (unsigned int)&_sbss;
     memset(&_sbss, 0x0, bsslen);
   }
+
+  SystemInit();
 
   (void) _init_crt1();
   (void) main();
