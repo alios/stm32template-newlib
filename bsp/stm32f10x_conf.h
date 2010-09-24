@@ -67,6 +67,12 @@
   #define assert_param(expr) ((void)0)
 #endif /* USE_FULL_ASSERT */
 
+
+
+#define USART1_ENABLED
+
 #endif /* __STM32F10x_CONF_H */
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+
+

@@ -4,6 +4,8 @@
 
 #include "irq.h"
 
+#include "usart.h"
+
 extern int main();
 
 extern void* _estack;
@@ -149,6 +151,12 @@ struct configword_struct
   }
 };
 
+static const driver_t* drivers[] = {
+#ifdef USART1_ENABLED
+  &usart1_driver,
+#endif
+  NULL
+};
 
 void _start() 
 {
@@ -167,6 +175,15 @@ void _start()
   }
 
   SystemInit();
+
+  /* enable drivers */
+  for(const driver_t* drv_p = drivers[0]; drv_p != NULL; drv_p++)
+    {
+      drv_p->driver_reset();
+      enable_clocks(drv_p);
+    }
+  
+  
 
   (void) _init_crt1();
   (void) main();
