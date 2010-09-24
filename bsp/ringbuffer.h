@@ -5,11 +5,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct ringbuffer {
-  size_t size;
-  size_t writer;
-  size_t reader;
-  uint8_t* buffer;
+#include <stm32f10x_conf.h>
+
+typedef struct ringbuffer
+{
+	size_t size;
+	size_t writer;
+	size_t reader;
+	uint8_t* buffer;
 } ringbuffer_t;
 
 void initRingBuffer(ringbuffer_t* rb, uint8_t* buffer, const size_t size);

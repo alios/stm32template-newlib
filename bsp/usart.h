@@ -7,6 +7,5 @@
 extern const driver_t usart1_driver;
 #endif /* USART1_ENABLED */
 
-
 #endif /* __USART_H__ */
 
