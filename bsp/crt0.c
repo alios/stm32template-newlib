@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stm32f10x_conf.h>
-
 #include "irq.h"
 
 #include "usart.h"
@@ -18,6 +17,10 @@ extern void* _eusrstack;
 
 void _start();
 extern void _init_crt1();
+
+extern void xPortPendSVHandler( void ) __attribute__ (( naked ));
+extern void xPortSysTickHandler( void );
+extern void vPortSVCHandler( void ) __attribute__ (( naked ));
 
 /* IRQ vector table */
 __attribute__ ((section(".isr_vector")))
@@ -39,11 +42,11 @@ struct configword_struct
 		NULL,
 		NULL,
 		NULL,
-		SVC_Handler,
+		vPortSVCHandler,
 		DebugMon_Handler,
 		NULL,
-		PendSV_Handler,
-		SysTick_Handler,
+		xPortPendSVHandler,
+		xPortSysTickHandler,
 		WWDG_IRQHandler,
 		PVD_IRQHandler,
 		TAMPER_IRQHandler,
@@ -187,7 +190,7 @@ void _start()
 	__set_PSP((uint32_t) &_eusrstack);
 
 	/* enable drivers */
-	for (size_t i = 0; i < sizeof(drivers); i++)
+	/*for (size_t i = 0; i < sizeof(drivers); i++)
 	{
 		const driver_t* drv_p = drivers[i];
 		if (drv_p->driver_reset != NULL)
@@ -195,6 +198,7 @@ void _start()
 		enable_clocks(drv_p);
 
 	}
+	*/
 
 	(void) _init_crt1();
 	(void) main();

@@ -57,14 +57,13 @@ int _open_r (struct _reent *_r, const char *file, int flags, int mode)
 */
 
 
-void *_sbrk_r(struct _reent *r, intptr_t incr)
+void *_sbrk(intptr_t incr)
 {
   void* retval = 0;
   intptr_t newbrk = (intptr_t)((size_t)heap_ptr + (size_t)incr);
 
   if(newbrk >=  (intptr_t)eheap_p)
     {
-      r->_errno = ENOMEM;
       retval = (void *)-1;
     }
   else 
@@ -78,6 +77,18 @@ void *_sbrk_r(struct _reent *r, intptr_t incr)
 
   return  retval;
 }
+
+void *_sbrk_r(struct _reent *r, intptr_t incr)
+{
+
+  void* retval = _sbrk(incr);
+	
+  if (retval == (void *)-1)
+	r->_errno = ENOMEM;
+
+  return retval;
+}
+
 
 void _init_crt1() 
 {
