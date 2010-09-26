@@ -69,7 +69,7 @@
 
 
 
-#define USART1_ENABLED
+#define USART2_ENABLED
 
 #endif /* __STM32F10x_CONF_H */
 

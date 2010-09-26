@@ -1,6 +1,9 @@
 #ifndef IRQ_H__
 #define IRQ_H__
 
+#include "stm32f10x_conf.h"
+#include "usart.h"
+
 void IRQHandler(void);
 
 void NMIException(void);

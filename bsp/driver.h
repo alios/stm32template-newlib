@@ -12,6 +12,5 @@ typedef struct driver
 	const uint32_t apb2_periph_clocks;
 } driver_t;
 
-void enable_clocks(const driver_t* drv_p);
 
 #endif /* __DRIVER_H__ */

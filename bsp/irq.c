@@ -1,21 +1,6 @@
 #include <stdint.h>
 #include "irq.h"
 
-void SVC_Handler_main(uint32_t* svc_args)
-{
-	uint32_t svc_number;
-
-	svc_number = ((char *) svc_args[6])[-2];
-
-	switch (svc_number)
-	{
-	case 0:
-		break;
-	default:
-		break;
-	}
-}
-
 void NMIException(void)
 {
 	for (;;)
@@ -246,11 +231,15 @@ void USART1_IRQHandler(void)
 	for (;;)
 		;
 }
+
+#ifndef USART2_ENABLED
 void USART2_IRQHandler(void)
 {
 	for (;;)
 		;
 }
+#endif
+
 void USART3_IRQHandler(void)
 {
 	for (;;)

@@ -18,9 +18,9 @@ extern void* _eusrstack;
 void _start();
 extern void _init_crt1();
 
-extern void xPortPendSVHandler( void ) __attribute__ (( naked ));
-extern void xPortSysTickHandler( void );
-extern void vPortSVCHandler( void ) __attribute__ (( naked ));
+extern void xPortPendSVHandler(void) __attribute__ (( naked ));
+extern void xPortSysTickHandler(void);
+extern void vPortSVCHandler(void) __attribute__ (( naked ));
 
 /* IRQ vector table */
 __attribute__ ((section(".isr_vector")))
@@ -155,21 +155,6 @@ struct configword_struct
 	}
 };
 
-void null_driver_reset()
-{
-}
-
-static const driver_t null_driver =
-	{ "null", NULL, 0, 0, 0 };
-
-static const driver_t*	 drivers[] =
-{
-#ifdef USART1_ENABLED
-		&usart1_driver,
-#endif
-		&null_driver
-};
-
 void _start()
 {
 	/* copy data segment from flash to ram */
@@ -186,19 +171,15 @@ void _start()
 
 	SystemInit();
 
+	/* Set the Vector Table base address at 0x08000000 */
+	NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x0);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+
+	/* Configure HCLK clock as SysTick clock source. */
+	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
+
 	/* set process stack */
 	__set_PSP((uint32_t) &_eusrstack);
-
-	/* enable drivers */
-	/*for (size_t i = 0; i < sizeof(drivers); i++)
-	{
-		const driver_t* drv_p = drivers[i];
-		if (drv_p->driver_reset != NULL)
-		  drv_p->driver_reset();
-		enable_clocks(drv_p);
-
-	}
-	*/
 
 	(void) _init_crt1();
 	(void) main();

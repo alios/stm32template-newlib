@@ -109,7 +109,7 @@ ASFLAGS=-mcpu=cortex-m3 -mthumb --gdwarf-2
 GENDEPFLAGS=-MD -MP -MF .deps/$(@F).d
 LDFLAGS=-static -L. -l$(LIB_STM32_LIB) -l$(LIB_STM32DSP_LIB) -l$(LIB_BSP_LIB) -l$(LIB_CRT_LIB) -l$(LIB_FREERTOS_LIB) -Wl,-Map,$(PROJ).map,--gc-sections -nostartfiles -T $(LDFILE) 
 
-$(PROJ).elf: $(OBJS) $(LIBS) $(LDFILE) 
+$(PROJ).elf: $(OBJS) $(LIBS) $(LDFILE) $(LDFILE)
 	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 
 clean: libsclean
