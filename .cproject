@@ -7,6 +7,8 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="0.1621891820" moduleId="org.eclipse.cdt.core.settings" name="Default">
 				<externalSettings/>
 				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -16,10 +18,10 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration buildProperties="" description="" id="0.1621891820" name="Default" parent="org.eclipse.cdt.build.core.prefbase.cfg">
+				<configuration artifactName="stm32template-newlib" buildProperties="" description="" id="0.1621891820" name="Default" parent="org.eclipse.cdt.build.core.prefbase.cfg">
 					<folderInfo id="0.1621891820." name="/" resourcePath="">
 						<toolChain id="org.eclipse.cdt.build.core.prefbase.toolchain.884229741" name="No ToolChain" resourceTypeBasedDiscovery="false" superClass="org.eclipse.cdt.build.core.prefbase.toolchain">
-							<targetPlatform id="org.eclipse.cdt.build.core.prefbase.toolchain.884229741.1414546102" name=""/>
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="org.eclipse.cdt.build.core.prefbase.toolchain.884229741.1414546102" name=""/>
 							<builder id="org.eclipse.cdt.build.core.settings.default.builder.77128411" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="-1" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.1760079882" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs"/>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.1986855770" name="Assembly" superClass="org.eclipse.cdt.build.core.settings.holder">
@@ -176,9 +178,29 @@
 							<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.743213440" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 						</tool>
 					</fileInfo>
+					<fileInfo id="0.1621891820.1458976915" name="assert.c" rcbsApplicability="disable" resourcePath="bsp/assert.c" toolsToInvoke="org.eclipse.cdt.build.core.settings.holder.977289948.1644800116">
+						<tool id="org.eclipse.cdt.build.core.settings.holder.977289948.1644800116" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder.1986855770">
+							<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1639627540" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+						</tool>
+					</fileInfo>
 					<fileInfo id="0.1621891820.113757494" name="crt0.c" rcbsApplicability="disable" resourcePath="bsp/crt0.c" toolsToInvoke="org.eclipse.cdt.build.core.settings.holder.977289948.1950780376">
 						<tool id="org.eclipse.cdt.build.core.settings.holder.977289948.1950780376" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder.1986855770">
 							<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1982391538" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="0.1621891820.535922359" name="ringbuffer.c" rcbsApplicability="disable" resourcePath="bsp/ringbuffer.c" toolsToInvoke="org.eclipse.cdt.build.core.settings.holder.977289948.720100582">
+						<tool id="org.eclipse.cdt.build.core.settings.holder.977289948.720100582" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder.1986855770">
+							<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.2011643967" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="0.1621891820.623901687" name="driver.c" rcbsApplicability="disable" resourcePath="bsp/driver.c" toolsToInvoke="org.eclipse.cdt.build.core.settings.holder.977289948.705607043">
+						<tool id="org.eclipse.cdt.build.core.settings.holder.977289948.705607043" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder.1986855770">
+							<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1400857485" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="0.1621891820.874332127" name="usart.c" rcbsApplicability="disable" resourcePath="bsp/usart.c" toolsToInvoke="org.eclipse.cdt.build.core.settings.holder.977289948.853973130">
+						<tool id="org.eclipse.cdt.build.core.settings.holder.977289948.853973130" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder.1986855770">
+							<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1544190112" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 						</tool>
 					</fileInfo>
 					<fileInfo id="0.1621891820.1109979394" name="irq.c" rcbsApplicability="disable" resourcePath="bsp/irq.c" toolsToInvoke="org.eclipse.cdt.build.core.settings.holder.977289948.267062598">
@@ -504,6 +526,7 @@
 					</profile>
 				</scannerConfigBuildInfo>
 			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
