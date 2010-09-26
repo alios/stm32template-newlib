@@ -152,12 +152,20 @@ struct configword_struct
 	}
 };
 
-static const driver_t* drivers[] =
+void null_driver_reset()
+{
+}
+
+static const driver_t null_driver =
+	{ "null", NULL, 0, 0, 0 };
+
+static const driver_t*	 drivers[] =
 {
 #ifdef USART1_ENABLED
 		&usart1_driver,
 #endif
-		NULL };
+		&null_driver
+};
 
 void _start()
 {
@@ -179,9 +187,11 @@ void _start()
 	__set_PSP((uint32_t) &_eusrstack);
 
 	/* enable drivers */
-	for (const driver_t* drv_p = drivers[0]; drv_p != NULL; drv_p++)
+	for (size_t i = 0; i < sizeof(drivers); i++)
 	{
-		drv_p->driver_reset();
+		const driver_t* drv_p = drivers[i];
+		if (drv_p->driver_reset != NULL)
+		  drv_p->driver_reset();
 		enable_clocks(drv_p);
 
 	}

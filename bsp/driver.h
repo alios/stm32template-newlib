@@ -10,7 +10,6 @@ typedef struct driver
 	const uint32_t ahb_periph_clocks;
 	const uint32_t apb1_periph_clocks;
 	const uint32_t apb2_periph_clocks;
-	const GPIO_InitTypeDef* gpios[];
 } driver_t;
 
 void enable_clocks(const driver_t* drv_p);

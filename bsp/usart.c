@@ -19,16 +19,19 @@ static void usart1_reset(void)
 	initRingBuffer(&usart1_tx, _usart1tx_buffer, USART_BUFFER_SIZE);
 }
 
-static const GPIO_InitTypeDef usart1_gpio_rx =
-{ GPIO_Pin_10, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING };
-static const GPIO_InitTypeDef usart1_gpio_tx =
-{ GPIO_Pin_9, GPIO_Speed_50MHz, GPIO_Mode_AF_PP };
-
-static const GPIO_InitTypeDef* usart1_gpios[3] =
-{ &usart1_gpio_rx, &usart1_gpio_tx, NULL };
+const GPIO_InitTypeDef usart_gpios[] =
+	{ { GPIO_Pin_10, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING }
+	, { GPIO_Pin_9, GPIO_Speed_50MHz, GPIO_Mode_AF_PP }
+	};
 
 const driver_t usart1_driver =
-{ "usart1", usart1_reset, 0, 0, 0, usart1_gpios };
+	{ "usart1"
+	, usart1_reset
+	, 0
+	, 0
+	, 0
+	};
+
 
 #endif /* USART1_ENABLED */
 
