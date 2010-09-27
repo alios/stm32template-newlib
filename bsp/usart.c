@@ -38,9 +38,6 @@ void usart2_reset(void)
 	{
 		NVIC_InitTypeDef NVIC_InitStructure;
 
-		/* Configure the NVIC Preemption Priority Bits */
-		NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-
 		/* Enable the USARTy Interrupt */
 		NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
 		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
@@ -93,41 +90,32 @@ void USART2_IRQHandler(void)
 {
 	assert_param(usart2_initialized);
 
+	int32_t xHigherPriorityTaskWoken = 0;
+	int32_t xTaskWokenByReceive = 0;
+
 	if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
 	{
-		int32_t xHigherPriorityTaskWoken = 0;
-
 		/* Read one byte from the receive data register */
 		const uint8_t readByte = USART_ReceiveData(USART2);
 		xQueueSendFromISR(usart2_rxQueue, &readByte, &xHigherPriorityTaskWoken);
 		usart2_rx_counter++;
-
-		// Now the buffer is empty we can switch context if necessary.
-		if( xHigherPriorityTaskWoken )
-		{
-			// Actual macro used here is port specific.
-			taskYIELD();
-		}
 	}
 
 	if (USART_GetITStatus(USART2, USART_IT_TXE) != RESET)
 	{
-		int32_t xTaskWokenByReceive = 0;
 		uint16_t byteToWrite = 0;
 
 		if(xQueueReceiveFromISR(usart2_txQueue, ( void *)&byteToWrite, &xTaskWokenByReceive) )
 		{
 			USART_SendData(USART2, byteToWrite);
-
-			if(xTaskWokenByReceive != 0);
-			{
-				taskYIELD ();
-			}
 		} else {
 			/* Disable the USARTy Transmit interrupt */
 			USART_ITConfig(USART2, USART_IT_TXE, DISABLE);
 		}
 	}
+
+	portEND_SWITCHING_ISR( xTaskWokenByReceive );
+	portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
 }
 
 size_t usart2_write(const uint8_t *buf, size_t cnt)

@@ -9,6 +9,10 @@
 
 int main(void)
 {
+
+#ifdef USART2_ENABLED
+  usart2_reset();
+#endif
   vTaskStartScheduler();
   for(;;);
 }
