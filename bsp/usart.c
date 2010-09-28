@@ -28,22 +28,23 @@ void usart2_reset(void)
 	usart2_rxQueue = xQueueCreate(USART2_BUFFER_SIZE, sizeof(uint8_t));
 	usart2_txQueue = xQueueCreate(USART2_BUFFER_SIZE, sizeof(uint8_t));
 
-	/* Enable GPIO clock */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD | RCC_APB2Periph_AFIO, ENABLE);
-
-	/* Enable USART2 Clock */
-	RCC_APB2PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
-
 	/* configure NVIC */
 	{
 		NVIC_InitTypeDef NVIC_InitStructure;
 
 		/* Enable the USARTy Interrupt */
 		NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
 		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 		NVIC_Init(&NVIC_InitStructure);
 	}
+
+	/* Enable GPIO clock */
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD | RCC_APB2Periph_AFIO, ENABLE);
+
+	/* Enable USART2 Clock */
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
 
 	{
 		GPIO_InitTypeDef GPIO_InitStructure;
@@ -74,26 +75,28 @@ void usart2_reset(void)
 
 		/* Configure USARTy */
 		USART_Init(USART2, &USART_InitStructure);
-
-		/* Enable USARTy Receive and Transmit interrupts */
-		USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
-		USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
-
-		/* Enable the USARTy */
-		USART_Cmd(USART2, ENABLE);
 	}
 
+	/* Enable USARTy Receive and Transmit interrupts */
+	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
+	
+	/* Enable the USARTy */
+	USART_Cmd(USART2, ENABLE);
+
 	usart2_initialized = true;
+	usart2_write("usart2: initialized", 11);
 }
 
 void USART2_IRQHandler(void)
 {
-	assert_param(usart2_initialized);
-
 	int32_t xHigherPriorityTaskWoken = 0;
 	int32_t xTaskWokenByReceive = 0;
 
-	if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
+	const ITStatus rx_pending = USART_GetITStatus(USART2, USART_IT_RXNE);
+	const ITStatus tx_pending = USART_GetITStatus(USART2, USART_IT_TXE);
+
+	if (rx_pending != RESET)
 	{
 		/* Read one byte from the receive data register */
 		const uint8_t readByte = USART_ReceiveData(USART2);
@@ -101,7 +104,7 @@ void USART2_IRQHandler(void)
 		usart2_rx_counter++;
 	}
 
-	if (USART_GetITStatus(USART2, USART_IT_TXE) != RESET)
+	if (tx_pending != RESET)
 	{
 		uint16_t byteToWrite = 0;
 
