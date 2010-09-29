@@ -5,8 +5,9 @@
 #include <stdlib.h>
 
 #ifdef USART2_ENABLED
-void usart2_reset(void);
+void usart2_init(void);
 size_t usart2_write(const uint8_t *buf, size_t cnt);
+size_t usart2_read(uint8_t *buf, size_t cnt);
 #endif /* USART2_ENABLED */
 
 #endif /* __USART_H__ */

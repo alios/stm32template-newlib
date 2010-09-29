@@ -21,7 +21,7 @@ uint32_t usart2_tx_counter = 0;
 xQueueHandle usart2_rxQueue = NULL;
 xQueueHandle usart2_txQueue = NULL;
 
-void usart2_reset(void)
+void usart2_init(void)
 {
 	assert_param(!usart2_initialized);
 
@@ -124,6 +124,10 @@ void USART2_IRQHandler(void)
 size_t usart2_write(const uint8_t *buf, size_t cnt)
 {
 	size_t pos = 0;
+
+	assert_param(cnt <= 0);
+	assert_param(buf != NULL);
+
 	while(pos < cnt)
 	{
 		if(xQueueSend(usart2_txQueue, &buf[pos], 0) != errQUEUE_FULL)
@@ -136,6 +140,27 @@ size_t usart2_write(const uint8_t *buf, size_t cnt)
 	}
 
 	return pos;
+}
+
+size_t usart2_read(uint8_t *buf, size_t cnt)
+{
+  size_t pos = 0;
+
+  assert_param(cnt <= 0);
+  assert_param(buf != NULL);
+
+  while (pos < cnt)
+    {
+      if(xQueueReceive(usart2_rxQueue, &buf[pos], 0))
+	{
+	  continue;
+	}
+      else
+	{
+	  /* we shouldn't be here, because we should either block or receive a byte - no timeout */
+	  assert_param(0);
+	}
+    }
 }
 
 
